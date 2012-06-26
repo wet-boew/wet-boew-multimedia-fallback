@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="build-tasks" default="default" basedir=".">
+	<property environment="env" />
+	
+	<!-- flex task definition  -->	
+	<path id="flextasks.classpath">
+		<pathelement location="${flextasks.jar}" />
+	</path> 
+	<taskdef resource="flexTasks.tasks">
+		<classpath refid="flextasks.classpath" />
+	</taskdef>
+	
+	<target name="-set-flex-home" depends="-check-flex-home" if="flex.home.exist">
+		<property name="FLEX_HOME" value="${env.FLEX_HOME}" />
+	</target>
+	<target name="-check-flex-home">
+		<condition property="flex.home.exist">
+			<isset property="env.FLEX_HOME" />
+		</condition>
+	</target>
+</project>
