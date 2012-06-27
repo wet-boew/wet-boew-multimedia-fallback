@@ -9,7 +9,7 @@
 
 	<target name="build" description="" depends="-init, -build-flex" />
 
-	<target name="-init" depends="-set-flex-home">
+	<target name="-init" depends="-check-flex-sdk">
 		<mkdir dir="${dist.dir}"/>
 	</target>
 	
