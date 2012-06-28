@@ -144,9 +144,6 @@ package
 			_playbutton=UIFactory.createPlayButton(_h, _w, "playbutton");
 			addChild(_playbutton);
 			
-			// ( lazy alert! ) lets place a huge transparent area over the video to act as our hit region
-			addChild(UIFactory.createHitRegion(stage.stageHeight, stage.stageWidth, "canvas"));
-			
 			registerControls();
 			// call the resize to deal with pagezoom issues identified
 			stageResize(null);

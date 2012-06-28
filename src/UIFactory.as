@@ -58,25 +58,6 @@ package
 			return button;
 		}
 
-		public static function createHitRegion(h:Number, w:Number, id:String):MovieClip
-		{
-
-			var hr:MovieClip=new MovieClip();
-			// set the height and width of the movie
-			var dHeight:uint=h;
-			var dWidth:uint=w;
-			var bg:Shape=new Shape();
-			hr.addChild(bg);
-			hr.name=id;
-			//square.graphics.beginFill(0x848284);
-			bg.graphics.beginFill(0x000000);
-			bg.graphics.drawRoundRect(0, 0, dWidth, dHeight, 3);
-			bg.graphics.endFill();
-			bg.alpha=0;
-			hr.buttonMode=true;
-			return hr;
-		}
-
 		//The resizing function
 		// parameters @credits : http://circlecube.com/2009/01/how-to-as3-resize-a-movieclip-and-constrain-proportions-actionscript-tutorial/
 		// required: mc = the movieClip to resize
