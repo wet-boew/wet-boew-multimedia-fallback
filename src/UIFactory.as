@@ -77,26 +77,6 @@ package
 			return hr;
 		}
 
-		public static function createCaption(h:Number, w:Number, font:String, id:String):MovieClip
-		{
-			var hr:MovieClip=new MovieClip();
-			// set the height and width of the movie
-			hr.name=id;
-			var dHeight:uint=h;
-			var dWidth:uint=w;
-			var cp_txt:TextField=new TextField();
-			// Set the default text format
-			cp_txt.defaultTextFormat=new TextFormat(font, 12, 0xffffff, null, null, null, null, null, TextFormatAlign.CENTER);
-			cp_txt.autoSize=TextFieldAutoSize.CENTER;
-			cp_txt.multiline=true;
-			cp_txt.wordWrap=true;
-			cp_txt.selectable=true;
-			cp_txt.htmlText="";
-			cp_txt.filters=new Array(new DropShadowFilter(0, 45, 0, 1, 4, 4, 10, BitmapFilterQuality.HIGH));
-			hr.addChild(cp_txt);
-			return hr;
-		}
-
 		//The resizing function
 		// parameters @credits : http://circlecube.com/2009/01/how-to-as3-resize-a-movieclip-and-constrain-proportions-actionscript-tutorial/
 		// required: mc = the movieClip to resize
