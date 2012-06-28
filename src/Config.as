@@ -1,12 +1,11 @@
+/*!
+ * Web Experience Toolkit (WET) / Boîte à outils de l'expérience Web (BOEW)
+ * www.tbs.gc.ca/ws-nw/wet-boew/terms / www.sct.gc.ca/ws-nw/wet-boew/conditions
+ */
+
 package
 {
 	import org.osmf.display.ScaleMode;
-
-	/**
-	 * ...
-	 * @author Government of Canada
-	 */
-
 
 	public class Config
 	{

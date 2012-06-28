@@ -1,3 +1,8 @@
+/*!
+ * Web Experience Toolkit (WET) / Boîte à outils de l'expérience Web (BOEW)
+ * www.tbs.gc.ca/ws-nw/wet-boew/terms / www.sct.gc.ca/ws-nw/wet-boew/conditions
+ */
+
 package
 {
 	import flash.display.Bitmap;
@@ -30,10 +35,6 @@ package
 	import org.osmf.media.URLResource;
 	import org.osmf.traits.LoadState;
 
-	/**
-	 * ...
-	 * @author Government of Canada
-	 */
 	public class Main extends MovieClip
 	{
 		
