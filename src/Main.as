@@ -82,8 +82,7 @@ package
 		
 		public function currentTime():String
 		{
-			//return _player.mediaPlayer.currentTime
-			return "Fu Bar";
+			return _player.mediaPlayer.currentTime
 		}
 		
 		
