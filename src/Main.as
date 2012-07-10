@@ -80,8 +80,7 @@ package
 		
 		public function currentTime():String
 		{
-			//return _player.mediaPlayer.currentTime
-			return "Fu Bar";
+			return _player.mediaPlayer.currentTime
 		}
 		
 		
@@ -140,10 +139,6 @@ package
 			imgLoader.load(new URLRequest(settings.getParameter("posterimg")));
 			imgLoader.name="posterimg";
 			addChild(imgLoader);
-			
-			// Add a centered play button to stage
-			_playbutton=UIFactory.createPlayButton(_h, _w, "playbutton");
-			addChild(_playbutton);
 			
 			registerControls();
 			// call the resize to deal with pagezoom issues identified
