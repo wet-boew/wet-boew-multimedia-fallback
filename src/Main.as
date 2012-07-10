@@ -142,10 +142,6 @@ package
 			imgLoader.name="posterimg";
 			addChild(imgLoader);
 			
-			// Add a centered play button to stage
-			_playbutton=UIFactory.createPlayButton(_h, _w, "playbutton");
-			addChild(_playbutton);
-			
 			// ( lazy alert! ) lets place a huge transparent area over the video to act as our hit region
 			addChild(UIFactory.createHitRegion(stage.stageHeight, stage.stageWidth, "canvas"));
 			
