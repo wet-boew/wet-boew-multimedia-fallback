@@ -251,7 +251,7 @@ package
 
 		private function onComplete(evt:TimeEvent):void
 		{
-			getChildByName("posterimg").visible=true;
+			//getChildByName("posterimg").visible=true;
 		}
 
 		// seek is to fast forward or rewind the media element by percentage
