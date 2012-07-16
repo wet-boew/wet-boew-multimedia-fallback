@@ -5,35 +5,32 @@
 
 package
 {
-	import flash.display.Bitmap;
-	import flash.display.Loader;
 	import flash.display.MovieClip;
-	import flash.display.StageAlign;
+	import flash.display.Loader;
+	import flash.display.Bitmap;
 	import flash.display.StageScaleMode;
+	import flash.display.StageAlign;
+	import flash.external.ExternalInterface;
+	import flash.system.Security;
+	import flash.net.URLRequest;
+	
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
-	import flash.events.MouseEvent;
 	import flash.events.SecurityErrorEvent;
-	import flash.external.ExternalInterface;
-	import flash.net.URLLoader;
-	import flash.net.URLRequest;
-	import flash.system.Security;
-	import flash.text.TextField;
 	
-	import org.osmf.elements.AudioElement;
-	import org.osmf.events.BufferEvent;
 	import org.osmf.events.LoadEvent;
-	import org.osmf.events.MediaPlayerCapabilityChangeEvent;
+	import org.osmf.events.BufferEvent;
+
 	import org.osmf.events.MediaPlayerStateChangeEvent;
 	import org.osmf.events.MetadataEvent;
 	import org.osmf.events.PlayEvent;
 	import org.osmf.events.TimeEvent;
-	import org.osmf.layout.LayoutMetadata;
+	
 	import org.osmf.media.MediaPlayerSprite;
-	import org.osmf.media.MediaPlayerState;
 	import org.osmf.media.MediaType;
+	import org.osmf.media.MediaPlayerState;
 	import org.osmf.media.URLResource;
-	import org.osmf.traits.LoadState;
+	import org.osmf.elements.AudioElement;
 
 	public class Main extends MovieClip
 	{
@@ -49,7 +46,6 @@ package
 		private var _stageWidth:int = stage.stageWidth;
 		private var _totaltime:String;
 		private var _w:Number;
-		private var myAnim:LoadAnim;
 		private var settings:Config;
 		//TODO : Remove this variable (used for the audio description shell functionality)
 		private var _audioDesc:Boolean = false;
@@ -78,9 +74,35 @@ package
 			return !_player.mediaPlayer.playing;
 		}
 		
-		public function currentTime():String
+		public function CurrentTime():Number
 		{
 			return _player.mediaPlayer.currentTime
+		}
+		
+		public function SetCurrentTime(newTime:Number):void
+		{
+			if (_player.mediaPlayer.canSeekTo(newTime) || newTime < 0)
+			{
+				if (newTime >= _player.mediaPlayer.duration)
+				{
+					_player.mediaPlayer.seek(_player.mediaPlayer.duration);
+				}
+				else if (newTime < 0)
+				{
+					_player.mediaPlayer.seek(0);
+					_player.mediaPlayer.stop();
+					onComplete(null);
+				}
+				else
+				{
+					_player.mediaPlayer.seek(newTime);
+				}
+			}
+		}
+		
+		public function Duration():Number
+		{
+			return _player.mediaPlayer.duration;
 		}
 		
 		
@@ -114,7 +136,6 @@ package
 			_player=new MediaPlayerSprite();
 			_player.mediaPlayer.addEventListener(LoadEvent.BYTES_LOADED_CHANGE, onBytesUpdated);
 			_player.mediaPlayer.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferUpdated);
-			_player.mediaPlayer.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onPlayerStateChange);
 			_player.mediaPlayer.addEventListener(PlayEvent.PLAY_STATE_CHANGE, onPlayStateChange);
 			_player.mediaPlayer.addEventListener(TimeEvent.CURRENT_TIME_CHANGE, onTimeUpdated);
 			_player.mediaPlayer.addEventListener(TimeEvent.COMPLETE, onComplete);
@@ -140,22 +161,22 @@ package
 			imgLoader.name="posterimg";
 			addChild(imgLoader);
 			
-			registerControls();
+			registerCallbacks();
 			// call the resize to deal with pagezoom issues identified
 			stageResize(null);
 		}
 		
-		private function registerControls():void
+		private function registerCallbacks():void
 		{
-			// toggle the play button
 			ExternalInterface.addCallback("play", Play);
 			ExternalInterface.addCallback("pause", Pause);
 			ExternalInterface.addCallback("paused", Paused);
-			ExternalInterface.addCallback("currentTime", currentTime);
+			ExternalInterface.addCallback("currentTime", CurrentTime);
+			ExternalInterface.addCallback("setCurrentTime", SetCurrentTime);
+			ExternalInterface.addCallback("duration", Duration);
 			
 			ExternalInterface.addCallback("toggleMute", toggleMute);
 			ExternalInterface.addCallback("toggleAudioDescription", toggleAudioDescription);
-			ExternalInterface.addCallback("seek", seek);
 		}
 		
 		/**
@@ -186,7 +207,7 @@ package
 		private function imgCompleteHandler(event:Event):void
 		{
 			var imageLoader:Loader=Loader(event.target.loader);
-			UIFactory.resizeMe(imageLoader, stage.stageWidth, stage.stageHeight, false);
+			Utils.resizeMe(imageLoader, stage.stageWidth, stage.stageHeight, false);
 			Bitmap(imageLoader.content).smoothing=true;
 		}
 		
@@ -209,18 +230,6 @@ package
 		{
 			//ExternalInterface.call("mPlayerRemote.update", this._id, "buffer", evt.target.bufferLength);
 		}
-		
-		private function onPlayerStateChange(evt:MediaPlayerStateChangeEvent):void
-		{
-			switch (evt.state)
-			{
-				case MediaPlayerState.BUFFERING:
-					myAnim.visible=true;
-					break;
-				default:
-					myAnim.visible=false;
-			}
-		}
 
 		private function onPlayStateChange(evt:PlayEvent):void
 		{
@@ -228,7 +237,6 @@ package
 			{
 				ExternalInterface.call("setTimeout", "pe.triggermediaevent('" + this._id + "', 'play')", 0);
 				ExternalInterface.call("setTimeout", "pe.triggermediaevent('" + this._id + "', 'playing')", 0);
-				getChildByName("playbutton").visible=false;
 				if (_player.media is AudioElement)
 				{
 					getChildByName("posterimg").visible=true;
@@ -252,32 +260,8 @@ package
 
 		private function onComplete(evt:TimeEvent):void
 		{
-			getChildByName("posterimg").visible=true;
-		}
-
-		// seek is to fast forward or rewind the media element by percentage
-		// the value is a percentage of the total duration
-		private function seek(amount:String):void
-		{
-			var newTime:Number=_player.mediaPlayer.currentTime + Number(amount);
-
-			if (_player.mediaPlayer.canSeekTo(newTime) || newTime < 0)
-			{
-				if (newTime >= _player.mediaPlayer.duration)
-				{
-					_player.mediaPlayer.seek(_player.mediaPlayer.duration);
-				}
-				else if (newTime < 0)
-				{
-					_player.mediaPlayer.seek(0);
-					_player.mediaPlayer.stop();
-					onComplete(null);
-				}
-				else
-				{
-					_player.mediaPlayer.seek(newTime);
-				}
-			}
+			ExternalInterface.call("setTimeout", "pe.triggermediaevent('" + this._id + "', 'ended')", 0);
+			//getChildByName("posterimg").visible=true;
 		}
 
 		
@@ -296,7 +280,6 @@ package
 			//ExternalInterface.call("mPlayerRemote.update", this._id, (_player.mediaPlayer.volume > 0) ? "unmute" : "mute");
 		}
 
-		
 	}
 
 }
