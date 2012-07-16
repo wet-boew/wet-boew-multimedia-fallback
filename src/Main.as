@@ -46,7 +46,6 @@ package
 		private var _stageWidth:int = stage.stageWidth;
 		private var _totaltime:String;
 		private var _w:Number;
-		private var myAnim:LoadAnim;
 		private var settings:Config;
 		//TODO : Remove this variable (used for the audio description shell functionality)
 		private var _audioDesc:Boolean = false;
@@ -111,7 +110,6 @@ package
 			_player=new MediaPlayerSprite();
 			_player.mediaPlayer.addEventListener(LoadEvent.BYTES_LOADED_CHANGE, onBytesUpdated);
 			_player.mediaPlayer.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferUpdated);
-			_player.mediaPlayer.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onPlayerStateChange);
 			_player.mediaPlayer.addEventListener(PlayEvent.PLAY_STATE_CHANGE, onPlayStateChange);
 			_player.mediaPlayer.addEventListener(TimeEvent.CURRENT_TIME_CHANGE, onTimeUpdated);
 			_player.mediaPlayer.addEventListener(TimeEvent.COMPLETE, onComplete);
@@ -205,18 +203,6 @@ package
 		private function onBufferUpdated(evt:BufferEvent):void
 		{
 			//ExternalInterface.call("mPlayerRemote.update", this._id, "buffer", evt.target.bufferLength);
-		}
-		
-		private function onPlayerStateChange(evt:MediaPlayerStateChangeEvent):void
-		{
-			switch (evt.state)
-			{
-				case MediaPlayerState.BUFFERING:
-					myAnim.visible=true;
-					break;
-				default:
-					myAnim.visible=false;
-			}
 		}
 
 		private function onPlayStateChange(evt:PlayEvent):void
