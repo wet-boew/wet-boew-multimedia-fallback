@@ -78,7 +78,7 @@ package
 			return !_player.mediaPlayer.playing;
 		}
 		
-		public function currentTime():String
+		public function currentTime():Number
 		{
 			return _player.mediaPlayer.currentTime
 		}
