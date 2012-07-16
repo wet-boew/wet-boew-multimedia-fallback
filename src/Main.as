@@ -5,33 +5,32 @@
 
 package
 {
-	import flash.display.Bitmap;
-	import flash.display.Loader;
 	import flash.display.MovieClip;
-	import flash.display.StageAlign;
+	import flash.display.Loader;
+	import flash.display.Bitmap;
 	import flash.display.StageScaleMode;
+	import flash.display.StageAlign;
+	import flash.external.ExternalInterface;
+	import flash.system.Security;
+	import flash.net.URLRequest;
+	
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.events.SecurityErrorEvent;
-	import flash.external.ExternalInterface;
-	import flash.net.URLLoader;
-	import flash.net.URLRequest;
-	import flash.system.Security;
 	
-	import org.osmf.elements.AudioElement;
-	import org.osmf.events.BufferEvent;
 	import org.osmf.events.LoadEvent;
-	import org.osmf.events.MediaPlayerCapabilityChangeEvent;
+	import org.osmf.events.BufferEvent;
+
 	import org.osmf.events.MediaPlayerStateChangeEvent;
 	import org.osmf.events.MetadataEvent;
 	import org.osmf.events.PlayEvent;
 	import org.osmf.events.TimeEvent;
-	import org.osmf.layout.LayoutMetadata;
+	
 	import org.osmf.media.MediaPlayerSprite;
-	import org.osmf.media.MediaPlayerState;
 	import org.osmf.media.MediaType;
+	import org.osmf.media.MediaPlayerState;
 	import org.osmf.media.URLResource;
-	import org.osmf.traits.LoadState;
+	import org.osmf.elements.AudioElement;
 
 	public class Main extends MovieClip
 	{
