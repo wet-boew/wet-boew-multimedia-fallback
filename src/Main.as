@@ -74,9 +74,35 @@ package
 			return !_player.mediaPlayer.playing;
 		}
 		
-		public function currentTime():Number
+		public function CurrentTime():Number
 		{
 			return _player.mediaPlayer.currentTime
+		}
+		
+		public function SetCurrentTime(newTime:Number):void
+		{
+			if (_player.mediaPlayer.canSeekTo(newTime) || newTime < 0)
+			{
+				if (newTime >= _player.mediaPlayer.duration)
+				{
+					_player.mediaPlayer.seek(_player.mediaPlayer.duration);
+				}
+				else if (newTime < 0)
+				{
+					_player.mediaPlayer.seek(0);
+					_player.mediaPlayer.stop();
+					onComplete(null);
+				}
+				else
+				{
+					_player.mediaPlayer.seek(newTime);
+				}
+			}
+		}
+		
+		public function Duration():Number
+		{
+			return _player.mediaPlayer.duration;
 		}
 		
 		
@@ -135,22 +161,22 @@ package
 			imgLoader.name="posterimg";
 			addChild(imgLoader);
 			
-			registerControls();
+			registerCallbacks();
 			// call the resize to deal with pagezoom issues identified
 			stageResize(null);
 		}
 		
-		private function registerControls():void
+		private function registerCallbacks():void
 		{
-			// toggle the play button
 			ExternalInterface.addCallback("play", Play);
 			ExternalInterface.addCallback("pause", Pause);
 			ExternalInterface.addCallback("paused", Paused);
-			ExternalInterface.addCallback("currentTime", currentTime);
+			ExternalInterface.addCallback("currentTime", CurrentTime);
+			ExternalInterface.addCallback("setCurrentTime", SetCurrentTime);
+			ExternalInterface.addCallback("duration", Duration);
 			
 			ExternalInterface.addCallback("toggleMute", toggleMute);
 			ExternalInterface.addCallback("toggleAudioDescription", toggleAudioDescription);
-			ExternalInterface.addCallback("seek", seek);
 		}
 		
 		/**
@@ -235,31 +261,6 @@ package
 		private function onComplete(evt:TimeEvent):void
 		{
 			//getChildByName("posterimg").visible=true;
-		}
-
-		// seek is to fast forward or rewind the media element by percentage
-		// the value is a percentage of the total duration
-		private function seek(amount:String):void
-		{
-			var newTime:Number=_player.mediaPlayer.currentTime + Number(amount);
-
-			if (_player.mediaPlayer.canSeekTo(newTime) || newTime < 0)
-			{
-				if (newTime >= _player.mediaPlayer.duration)
-				{
-					_player.mediaPlayer.seek(_player.mediaPlayer.duration);
-				}
-				else if (newTime < 0)
-				{
-					_player.mediaPlayer.seek(0);
-					_player.mediaPlayer.stop();
-					onComplete(null);
-				}
-				else
-				{
-					_player.mediaPlayer.seek(newTime);
-				}
-			}
 		}
 
 		
