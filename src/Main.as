@@ -260,6 +260,7 @@ package
 
 		private function onComplete(evt:TimeEvent):void
 		{
+			ExternalInterface.call("setTimeout", "pe.triggermediaevent('" + this._id + "', 'ended')", 0);
 			//getChildByName("posterimg").visible=true;
 		}
 
