@@ -58,58 +58,6 @@ package
 		;
 
 		/**
-	* Unescape a string and filter "asfunction" occurences ( can be used for XSS exploits).
-	*
-	* @param str	The string to decode.
-	* @return 		The decoded string.
-	**/
-		public static function decode(str:String):String
-		{
-			if (str.indexOf('asfunction') == -1)
-			{
-				return unescape(str);
-			}
-			else
-			{
-				return '';
-			}
-		}
-		;
-
-		/**
-		* Basic serialization: string representations of booleans and numbers are returned typed;
-		* strings are returned urldecoded.
-		*
-		* @param val	String value to serialize.
-		* @return		The original value in the correct primitive type.
-		**/
-		public static function serialize(val:String):Object
-		{
-			if (val == null)
-			{
-				return null;
-			}
-			else if (val == 'true')
-			{
-				return true;
-			}
-			else if (val == 'false')
-			{
-				return false;
-			}
-			else if (isNaN(Number(val)) || val.length > 5)
-			{
-				return Utils.decode(val);
-			}
-			else
-			{
-				return Number(val);
-			}
-		}
-		;
-
-
-		/**
 		* Add a leading zero to a number.
 		*
 		* @param nbr	The number to convert. Can be 0 to 99.
