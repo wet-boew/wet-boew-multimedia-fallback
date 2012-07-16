@@ -228,7 +228,6 @@ package
 			{
 				ExternalInterface.call("setTimeout", "pe.triggermediaevent('" + this._id + "', 'play')", 0);
 				ExternalInterface.call("setTimeout", "pe.triggermediaevent('" + this._id + "', 'playing')", 0);
-				getChildByName("playbutton").visible=false;
 				if (_player.media is AudioElement)
 				{
 					getChildByName("posterimg").visible=true;
