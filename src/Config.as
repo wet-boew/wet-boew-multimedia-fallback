@@ -18,10 +18,8 @@ package
 			// Set the defaults for the init
 			options.media=(config.media) ? config.media : "";
 			options.height=(config.height) ? config.height : "110"; // default to lowest possible while preserving 16:9 ratio
-			options.captionType=(config.captionType) ? config.captionType : "xml"; // default to timedtext
 			options.width=(config.width) ? config.width : "195";
 			options.id=(config.id) ? config.id : "mediaplayer";
-			options.lang=(config.lang) ? config.lang : "eng";
 			options.scale=(config.scale) ? config.scale : "default";
 			options.autoplay=(config.autoplay) ? config.autoplay : "false";
 			options.posterimg=(config.posterimg) ? config.posterimg : "wmms.png"; // We could create a generic png with the GC as a fallback
