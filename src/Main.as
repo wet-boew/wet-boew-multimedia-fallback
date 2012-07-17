@@ -37,12 +37,10 @@ package
 	{
 		private var _id:String;
 		
-		private var _h:Number;
-		private var _w:Number;
-		
 		private var _loaded:Boolean=false;
 		private var _mediaType:MediaType;
 		
+		private var poster:Loader;
 		private var _player:MediaPlayerSprite;
 		private var settings:Config;
 		//TODO : Remove this variable (used for the audio description shell functionality)
@@ -133,14 +131,13 @@ package
 			_player.mediaPlayer.muted = muted;
 		}
 		
-		
-		
 		/**
 		 *  Listeners and State functions
 		 * */
 		
 		private function init(evt:Event):void
 		{
+
 			Security.allowDomain("*");
 			removeEventListener(Event.ADDED_TO_STAGE, init);
 			// Stage alignment needs to be reset since the OSMF media player uses the scalemode to draw
@@ -149,19 +146,14 @@ package
 			stage.scaleMode=StageScaleMode.NO_SCALE;
 			stage.align=StageAlign.TOP_LEFT;
 			
-			
 			// Create a loader file that contains all the config parameters
 			// add some defaults to the parameters that are not apparent
 			settings=new Config(loaderInfo.parameters);
-			// set the canvas area dimensions ( this is a redundant way of doing this, we need to find a way to call the expected height and width from the loader more elegantly )
-			_h=int(settings.getParameter("height"));
-			_w=int(settings.getParameter("width"));
+			
 			// since the ExternalInterface library for flash needs the embed tag inorder to identify its self in the HTML DOM, we will feed it its id, since we cannot use embed tag for compliance
 			_id=settings.getParameter("id");
 			
 			// start creating the video player
-			// we need to set some default rules 
-			
 			_player=new MediaPlayerSprite();
 			_player.mediaPlayer.addEventListener(LoadEvent.BYTES_LOADED_CHANGE, onBytesUpdate);
 			_player.mediaPlayer.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferUpdate);
@@ -175,24 +167,19 @@ package
 			_player.mediaPlayer.volume=Number(settings.getParameter("volume"));
 			_player.scaleMode=settings.getScaleMode();
 			
-			// Set the dimensions since we know them from the loader object
-			_player.width=_w;
-			_player.height=_h;
 			// Put the video sprite to stage
 			_player.resource=new URLResource(settings.getParameter("media"));
 			addChild(_player);
 			
 			// load poster image for the multimedia
 			
-			var imgLoader:Loader=new Loader();
-			imgLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, OnImgComplete);
-			imgLoader.load(new URLRequest(settings.getParameter("posterimg")));
-			imgLoader.name="posterimg";
-			addChild(imgLoader);
+			poster=new Loader();
+			poster.contentLoaderInfo.addEventListener(Event.COMPLETE, OnImgComplete);
+			poster.load(new URLRequest(settings.getParameter("posterimg")));
+			poster.name="posterimg";
+			addChild(poster);
 			
 			registerCallbacks();
-			// call the resize to deal with pagezoom issues identified
-			OnStageResize(null);
 		}
 		
 		private function registerCallbacks():void
@@ -216,30 +203,23 @@ package
 		/**
 		 *  Event bindings for various components
 		 */
-		
-		private function resizeVideo():void
-		{
-			this._player.width=stage.stageWidth;
-			this._player.height=stage.stageHeight;
-			Utils.center(stage.stageWidth, stage.stageHeight, this._player);
-		}
-		
+
 		/**
 		 *  We need to introduce scaling for people that use zoom features in browsers
 		 * */
 		private function OnStageResize(evt:Event):void
 		{
-			// For the meantime we will do independant scaling. The next beta release will extend the resize each Object through state calls
-			
-			_player.width=getChildByName("canvas").width=getChildByName("posterimg").width=stage.stageWidth;
-			_player.height=getChildByName("canvas").height=getChildByName("posterimg").height=stage.stageHeight;
+			this.poster.width=stage.stageWidth;
+			this.poster.height=stage.stageHeight;
+			this._player.width=stage.stageWidth;
+			this._player.height=stage.stageHeight;
 		}
 		
 		private function OnImgComplete(event:Event):void
 		{
 			var imageLoader:Loader=Loader(event.target.loader);
-			Utils.resizeMe(imageLoader, stage.stageWidth, stage.stageHeight, false);
 			Bitmap(imageLoader.content).smoothing=true;
+			OnStageResize(null);
 		}
 		
 		private function onBytesUpdate(evt:LoadEvent):void
@@ -253,7 +233,8 @@ package
 		}
 
 		private function onPlayStateChange(evt:PlayEvent):void
-		{
+		{_player.width=stage.stageWidth;
+			_player.height=stage.stageHeight;
 			if (_player.mediaPlayer.playing)
 			{
 				ExternalInterface.call("setTimeout", "pe.triggermediaevent('" + this._id + "', 'play')", 0);
