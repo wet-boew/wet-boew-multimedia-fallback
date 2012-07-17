@@ -115,6 +115,16 @@ package
 			return _player.mediaPlayer.bufferLength;
 		}
 		
+		public function Volume():Number
+		{
+			return _player.mediaPlayer.volume;
+		}
+		
+		public function SetVolume(volume:Number):void
+		{
+			_player.mediaPlayer.volume = volume;
+		}
+		
 		
 		
 		/**
@@ -187,6 +197,8 @@ package
 			ExternalInterface.addCallback("duration", Duration);
 			ExternalInterface.addCallback("seeking", Seeking);
 			ExternalInterface.addCallback("buffered", Buffered);
+			ExternalInterface.addCallback("volume", Volume);
+			ExternalInterface.addCallback("setVolume", SetVolume);
 			
 			ExternalInterface.addCallback("toggleMute", toggleMute);
 			ExternalInterface.addCallback("toggleAudioDescription", toggleAudioDescription);
