@@ -144,7 +144,7 @@ package
 			removeEventListener(Event.ADDED_TO_STAGE, init);
 			// Stage alignment needs to be reset since the OSMF media player uses the scalemode to draw
 			//  the elements on the stage. It centers by default which causes problems for SWF dynamic sizing
-			stage.addEventListener(Event.RESIZE, stageResize);
+			stage.addEventListener(Event.RESIZE, OnStageResize);
 			stage.scaleMode=StageScaleMode.NO_SCALE;
 			stage.align=StageAlign.TOP_LEFT;
 			
@@ -162,10 +162,10 @@ package
 			// we need to set some default rules 
 			
 			_player=new MediaPlayerSprite();
-			_player.mediaPlayer.addEventListener(LoadEvent.BYTES_LOADED_CHANGE, onBytesUpdated);
-			_player.mediaPlayer.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferUpdated);
+			_player.mediaPlayer.addEventListener(LoadEvent.BYTES_LOADED_CHANGE, onBytesUpdate);
+			_player.mediaPlayer.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferUpdate);
 			_player.mediaPlayer.addEventListener(PlayEvent.PLAY_STATE_CHANGE, onPlayStateChange);
-			_player.mediaPlayer.addEventListener(TimeEvent.CURRENT_TIME_CHANGE, onTimeUpdated);
+			_player.mediaPlayer.addEventListener(TimeEvent.CURRENT_TIME_CHANGE, onTimeUpdate);
 			_player.mediaPlayer.addEventListener(TimeEvent.COMPLETE, onComplete);
 			_player.mediaPlayer.autoPlay=settings.getParameter("autoplay") as Boolean;
 			_player.mediaPlayer.autoDynamicStreamSwitch = true;
@@ -182,14 +182,14 @@ package
 			// load poster image for the multimedia
 			
 			var imgLoader:Loader=new Loader();
-			imgLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, imgCompleteHandler);
+			imgLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, OnImgComplete);
 			imgLoader.load(new URLRequest(settings.getParameter("posterimg")));
 			imgLoader.name="posterimg";
 			addChild(imgLoader);
 			
 			registerCallbacks();
 			// call the resize to deal with pagezoom issues identified
-			stageResize(null);
+			OnStageResize(null);
 		}
 		
 		private function registerCallbacks():void
@@ -224,7 +224,7 @@ package
 		/**
 		 *  We need to introduce scaling for people that use zoom features in browsers
 		 * */
-		private function stageResize(evt:Event):void
+		private function OnStageResize(evt:Event):void
 		{
 			// For the meantime we will do independant scaling. The next beta release will extend the resize each Object through state calls
 			
@@ -232,19 +232,19 @@ package
 			_player.height=getChildByName("canvas").height=getChildByName("posterimg").height=stage.stageHeight;
 		}
 		
-		private function imgCompleteHandler(event:Event):void
+		private function OnImgComplete(event:Event):void
 		{
 			var imageLoader:Loader=Loader(event.target.loader);
 			Utils.resizeMe(imageLoader, stage.stageWidth, stage.stageHeight, false);
 			Bitmap(imageLoader.content).smoothing=true;
 		}
 		
-		private function onBytesUpdated(evt:LoadEvent):void
+		private function onBytesUpdate(evt:LoadEvent):void
 		{
 			//ExternalInterface.call("mPlayerRemote.update", this._id, "loaded", Math.floor((evt.target.bytesLoaded / evt.target.bytesTotal) * 100));
 		}
 		
-		private function onBufferUpdated(evt:BufferEvent):void
+		private function onBufferUpdate(evt:BufferEvent):void
 		{
 			//ExternalInterface.call("mPlayerRemote.update", this._id, "buffer", evt.target.bufferLength);
 		}
@@ -271,7 +271,7 @@ package
 			}
 		}
 
-		private function onTimeUpdated(evt:TimeEvent):void
+		private function onTimeUpdate(evt:TimeEvent):void
 		{
 				ExternalInterface.call("setTimeout", "pe.triggermediaevent('" + this._id + "', 'timeupdate')", 0);
 		}
