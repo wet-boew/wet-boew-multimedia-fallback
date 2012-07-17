@@ -25,6 +25,7 @@ package
 	import org.osmf.events.MetadataEvent;
 	import org.osmf.events.PlayEvent;
 	import org.osmf.events.TimeEvent;
+	import org.osmf.events.AudioEvent;	
 	
 	import org.osmf.media.MediaPlayerSprite;
 	import org.osmf.media.MediaType;
@@ -166,6 +167,8 @@ package
 			_player.mediaPlayer.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferUpdate);
 			_player.mediaPlayer.addEventListener(PlayEvent.PLAY_STATE_CHANGE, onPlayStateChange);
 			_player.mediaPlayer.addEventListener(TimeEvent.CURRENT_TIME_CHANGE, onTimeUpdate);
+			_player.mediaPlayer.addEventListener(AudioEvent.MUTED_CHANGE, onVolumeChange);
+			_player.mediaPlayer.addEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
 			_player.mediaPlayer.addEventListener(TimeEvent.COMPLETE, onComplete);
 			_player.mediaPlayer.autoPlay=settings.getParameter("autoplay") as Boolean;
 			_player.mediaPlayer.autoDynamicStreamSwitch = true;
@@ -274,6 +277,11 @@ package
 		private function onTimeUpdate(evt:TimeEvent):void
 		{
 				ExternalInterface.call("setTimeout", "pe.triggermediaevent('" + this._id + "', 'timeupdate')", 0);
+		}
+		
+		private function onVolumeChange(evt:AudioEvent):void
+		{
+			ExternalInterface.call("setTimeout", "pe.triggermediaevent('" + this._id + "', 'volumechange')", 0);
 		}
 
 		private function onComplete(evt:TimeEvent):void
