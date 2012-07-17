@@ -25,6 +25,7 @@ package
 	import org.osmf.events.MetadataEvent;
 	import org.osmf.events.PlayEvent;
 	import org.osmf.events.TimeEvent;
+	import org.osmf.events.AudioEvent;	
 	
 	import org.osmf.media.MediaPlayerSprite;
 	import org.osmf.media.MediaType;
@@ -34,18 +35,15 @@ package
 
 	public class Main extends MovieClip
 	{
+		private var _id:String;
 		
 		private var _h:Number;
-		private var _id:String;
+		private var _w:Number;
+		
 		private var _loaded:Boolean=false;
 		private var _mediaType:MediaType;
-		private var _playbutton:MovieClip;
 		
 		private var _player:MediaPlayerSprite;
-		private var _stageHeight:int = stage.stageHeight;
-		private var _stageWidth:int = stage.stageWidth;
-		private var _totaltime:String;
-		private var _w:Number;
 		private var settings:Config;
 		//TODO : Remove this variable (used for the audio description shell functionality)
 		private var _audioDesc:Boolean = false;
@@ -105,6 +103,37 @@ package
 			return _player.mediaPlayer.duration;
 		}
 		
+		public function Seeking():Boolean
+		{
+			return _player.mediaPlayer.seeking;
+		}
+		
+		public function Buffered():Number
+		{
+			return _player.mediaPlayer.bufferLength;
+		}
+		
+		public function Volume():Number
+		{
+			return _player.mediaPlayer.volume;
+		}
+		
+		public function SetVolume(volume:Number):void
+		{
+			_player.mediaPlayer.volume = volume;
+		}
+		
+		public function Muted():Boolean
+		{
+			return _player.mediaPlayer.muted;
+		}
+		
+		public function SetMuted(muted:Boolean):void
+		{
+			_player.mediaPlayer.muted = muted;
+		}
+		
+		
 		
 		/**
 		 *  Listeners and State functions
@@ -116,7 +145,7 @@ package
 			removeEventListener(Event.ADDED_TO_STAGE, init);
 			// Stage alignment needs to be reset since the OSMF media player uses the scalemode to draw
 			//  the elements on the stage. It centers by default which causes problems for SWF dynamic sizing
-			stage.addEventListener(Event.RESIZE, stageResize);
+			stage.addEventListener(Event.RESIZE, OnStageResize);
 			stage.scaleMode=StageScaleMode.NO_SCALE;
 			stage.align=StageAlign.TOP_LEFT;
 			
@@ -134,10 +163,12 @@ package
 			// we need to set some default rules 
 			
 			_player=new MediaPlayerSprite();
-			_player.mediaPlayer.addEventListener(LoadEvent.BYTES_LOADED_CHANGE, onBytesUpdated);
-			_player.mediaPlayer.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferUpdated);
+			_player.mediaPlayer.addEventListener(LoadEvent.BYTES_LOADED_CHANGE, onBytesUpdate);
+			_player.mediaPlayer.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferUpdate);
 			_player.mediaPlayer.addEventListener(PlayEvent.PLAY_STATE_CHANGE, onPlayStateChange);
-			_player.mediaPlayer.addEventListener(TimeEvent.CURRENT_TIME_CHANGE, onTimeUpdated);
+			_player.mediaPlayer.addEventListener(TimeEvent.CURRENT_TIME_CHANGE, onTimeUpdate);
+			_player.mediaPlayer.addEventListener(AudioEvent.MUTED_CHANGE, onVolumeChange);
+			_player.mediaPlayer.addEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
 			_player.mediaPlayer.addEventListener(TimeEvent.COMPLETE, onComplete);
 			_player.mediaPlayer.autoPlay=settings.getParameter("autoplay") as Boolean;
 			_player.mediaPlayer.autoDynamicStreamSwitch = true;
@@ -154,16 +185,14 @@ package
 			// load poster image for the multimedia
 			
 			var imgLoader:Loader=new Loader();
-			imgLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, imgCompleteHandler);
-			imgLoader.addEventListener(IOErrorEvent.IO_ERROR, onIOError)
-			imgLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onSecurityError)
+			imgLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, OnImgComplete);
 			imgLoader.load(new URLRequest(settings.getParameter("posterimg")));
 			imgLoader.name="posterimg";
 			addChild(imgLoader);
 			
 			registerCallbacks();
 			// call the resize to deal with pagezoom issues identified
-			stageResize(null);
+			OnStageResize(null);
 		}
 		
 		private function registerCallbacks():void
@@ -174,9 +203,14 @@ package
 			ExternalInterface.addCallback("currentTime", CurrentTime);
 			ExternalInterface.addCallback("setCurrentTime", SetCurrentTime);
 			ExternalInterface.addCallback("duration", Duration);
+			ExternalInterface.addCallback("seeking", Seeking);
+			ExternalInterface.addCallback("buffered", Buffered);
+			ExternalInterface.addCallback("volume", Volume);
+			ExternalInterface.addCallback("setVolume", SetVolume);
+			ExternalInterface.addCallback("muted", Muted);
+			ExternalInterface.addCallback("setMuted", SetMuted);
 			
-			ExternalInterface.addCallback("toggleMute", toggleMute);
-			ExternalInterface.addCallback("toggleAudioDescription", toggleAudioDescription);
+			//ExternalInterface.addCallback("toggleAudioDescription", toggleAudioDescription);
 		}
 		
 		/**
@@ -193,40 +227,27 @@ package
 		/**
 		 *  We need to introduce scaling for people that use zoom features in browsers
 		 * */
-		private function stageResize(evt:Event):void
+		private function OnStageResize(evt:Event):void
 		{
 			// For the meantime we will do independant scaling. The next beta release will extend the resize each Object through state calls
 			
 			_player.width=getChildByName("canvas").width=getChildByName("posterimg").width=stage.stageWidth;
 			_player.height=getChildByName("canvas").height=getChildByName("posterimg").height=stage.stageHeight;
-			
-			// Center the playbutton since the canvas has been reset
-			Utils.center(stage.stageHeight, stage.stageWidth, _playbutton);
 		}
 		
-		private function imgCompleteHandler(event:Event):void
+		private function OnImgComplete(event:Event):void
 		{
 			var imageLoader:Loader=Loader(event.target.loader);
 			Utils.resizeMe(imageLoader, stage.stageWidth, stage.stageHeight, false);
 			Bitmap(imageLoader.content).smoothing=true;
 		}
 		
-		private function onIOError(evt:IOErrorEvent):void
-		{
-			trace("IOError: " + evt.text)
-		}
-		
-		private function onSecurityError(evt:SecurityErrorEvent):void
-		{
-			trace("SecurityError: " + evt.text)
-		}
-		
-		private function onBytesUpdated(evt:LoadEvent):void
+		private function onBytesUpdate(evt:LoadEvent):void
 		{
 			//ExternalInterface.call("mPlayerRemote.update", this._id, "loaded", Math.floor((evt.target.bytesLoaded / evt.target.bytesTotal) * 100));
 		}
 		
-		private function onBufferUpdated(evt:BufferEvent):void
+		private function onBufferUpdate(evt:BufferEvent):void
 		{
 			//ExternalInterface.call("mPlayerRemote.update", this._id, "buffer", evt.target.bufferLength);
 		}
@@ -253,9 +274,14 @@ package
 			}
 		}
 
-		private function onTimeUpdated(evt:TimeEvent):void
+		private function onTimeUpdate(evt:TimeEvent):void
 		{
 				ExternalInterface.call("setTimeout", "pe.triggermediaevent('" + this._id + "', 'timeupdate')", 0);
+		}
+		
+		private function onVolumeChange(evt:AudioEvent):void
+		{
+			ExternalInterface.call("setTimeout", "pe.triggermediaevent('" + this._id + "', 'volumechange')", 0);
 		}
 
 		private function onComplete(evt:TimeEvent):void
@@ -266,20 +292,12 @@ package
 
 		
 		// toggleAudioDescription : toggle the audio description track
-		private function toggleAudioDescription(evt:Event):void
+		/*private function toggleAudioDescription(evt:Event):void
 		{
 			//TODO: Functionality to enable audio description
 			_audioDesc = !_audioDesc;
 			//ExternalInterface.call("mPlayerRemote.update", this._id, (this._audioDesc) ? "audiodescription" : "noaudiodescription");
-		}
-
-		// toggleMute : toggle the sound level from max to zero and back
-		private function toggleMute(evt:Event):void
-		{
-			_player.mediaPlayer.volume = (_player.mediaPlayer.volume > 0) ? 0 : Number(settings.getParameter("volume"));
-			//ExternalInterface.call("mPlayerRemote.update", this._id, (_player.mediaPlayer.volume > 0) ? "unmute" : "mute");
-		}
-
+		}*/
 	}
 
 }

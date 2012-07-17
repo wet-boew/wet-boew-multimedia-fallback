@@ -28,53 +28,7 @@ package
 			obj.y=h / 2 - (obj.height / 2);
 		}
 
-		public static function noCacheUrl(url:String):String
-		{
-			if (url.indexOf("?") > -1)
-			{
-				// this is already a dynamic URL so we are just appending a extra value
-				return url + "&time=" + Utils.random(999999999);
-			}
-			else
-			{
-				// the rest of the files should be static
-				return url + "?time=" + Utils.random(999999999);
-			}
-		}
-
-		/**
-		 *  Simplified random number generator that takes care of rounding up
-		 * @param	top - highest value for the random number
-		 * @return  random number from 0 - top parms
-		 */
-
-
-		public static function random(top:Number):Number
-		{
-			return Math.ceil(Math.random() * top);
-		}
-		;
-
-		/**
-		* Add a leading zero to a number.
-		*
-		* @param nbr	The number to convert. Can be 0 to 99.
-		* @ return		A string representation with possible leading 0.
-		**/
-		public static function zero(nbr:Number):String
-		{
-			if (nbr < 10)
-			{
-				return '0' + nbr;
-			}
-			else
-			{
-				return '' + nbr;
-			}
-		}
-		;
-		
-				//The resizing function
+		//The resizing function
 		// parameters @credits : http://circlecube.com/2009/01/how-to-as3-resize-a-movieclip-and-constrain-proportions-actionscript-tutorial/
 		// required: mc = the movieClip to resize
 		// required: maxW = either the size of the box to resize to, or just the maximum desired width
