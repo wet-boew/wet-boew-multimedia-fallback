@@ -34,18 +34,15 @@ package
 
 	public class Main extends MovieClip
 	{
+		private var _id:String;
 		
 		private var _h:Number;
-		private var _id:String;
+		private var _w:Number;
+		
 		private var _loaded:Boolean=false;
 		private var _mediaType:MediaType;
-		private var _playbutton:MovieClip;
 		
 		private var _player:MediaPlayerSprite;
-		private var _stageHeight:int = stage.stageHeight;
-		private var _stageWidth:int = stage.stageWidth;
-		private var _totaltime:String;
-		private var _w:Number;
 		private var settings:Config;
 		//TODO : Remove this variable (used for the audio description shell functionality)
 		private var _audioDesc:Boolean = false;
@@ -233,9 +230,6 @@ package
 			
 			_player.width=getChildByName("canvas").width=getChildByName("posterimg").width=stage.stageWidth;
 			_player.height=getChildByName("canvas").height=getChildByName("posterimg").height=stage.stageHeight;
-			
-			// Center the playbutton since the canvas has been reset
-			Utils.center(stage.stageHeight, stage.stageWidth, _playbutton);
 		}
 		
 		private function imgCompleteHandler(event:Event):void
