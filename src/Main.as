@@ -110,6 +110,12 @@ package
 			return _player.mediaPlayer.seeking;
 		}
 		
+		public function Buffered():Number
+		{
+			return _player.mediaPlayer.bufferLength;
+		}
+		
+		
 		
 		/**
 		 *  Listeners and State functions
@@ -180,6 +186,7 @@ package
 			ExternalInterface.addCallback("setCurrentTime", SetCurrentTime);
 			ExternalInterface.addCallback("duration", Duration);
 			ExternalInterface.addCallback("seeking", Seeking);
+			ExternalInterface.addCallback("buffered", Buffered);
 			
 			ExternalInterface.addCallback("toggleMute", toggleMute);
 			ExternalInterface.addCallback("toggleAudioDescription", toggleAudioDescription);
