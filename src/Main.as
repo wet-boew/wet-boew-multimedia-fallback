@@ -309,14 +309,6 @@ package
 			_audioDesc = !_audioDesc;
 			//ExternalInterface.call("mPlayerRemote.update", this._id, (this._audioDesc) ? "audiodescription" : "noaudiodescription");
 		}
-
-		// toggleMute : toggle the sound level from max to zero and back
-		private function toggleMute(evt:Event):void
-		{
-			_player.mediaPlayer.volume = (_player.mediaPlayer.volume > 0) ? 0 : Number(settings.getParameter("volume"));
-			//ExternalInterface.call("mPlayerRemote.update", this._id, (_player.mediaPlayer.volume > 0) ? "unmute" : "mute");
-		}
-
 	}
 
 }
