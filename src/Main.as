@@ -186,8 +186,6 @@ package
 			
 			var imgLoader:Loader=new Loader();
 			imgLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, imgCompleteHandler);
-			imgLoader.addEventListener(IOErrorEvent.IO_ERROR, onIOError)
-			imgLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onSecurityError)
 			imgLoader.load(new URLRequest(settings.getParameter("posterimg")));
 			imgLoader.name="posterimg";
 			addChild(imgLoader);
@@ -212,8 +210,7 @@ package
 			ExternalInterface.addCallback("muted", Muted);
 			ExternalInterface.addCallback("setMuted", SetMuted);
 			
-			ExternalInterface.addCallback("toggleMute", toggleMute);
-			ExternalInterface.addCallback("toggleAudioDescription", toggleAudioDescription);
+			//ExternalInterface.addCallback("toggleAudioDescription", toggleAudioDescription);
 		}
 		
 		/**
@@ -246,16 +243,6 @@ package
 			var imageLoader:Loader=Loader(event.target.loader);
 			Utils.resizeMe(imageLoader, stage.stageWidth, stage.stageHeight, false);
 			Bitmap(imageLoader.content).smoothing=true;
-		}
-		
-		private function onIOError(evt:IOErrorEvent):void
-		{
-			trace("IOError: " + evt.text)
-		}
-		
-		private function onSecurityError(evt:SecurityErrorEvent):void
-		{
-			trace("SecurityError: " + evt.text)
 		}
 		
 		private function onBytesUpdated(evt:LoadEvent):void
@@ -303,12 +290,12 @@ package
 
 		
 		// toggleAudioDescription : toggle the audio description track
-		private function toggleAudioDescription(evt:Event):void
+		/*private function toggleAudioDescription(evt:Event):void
 		{
 			//TODO: Functionality to enable audio description
 			_audioDesc = !_audioDesc;
 			//ExternalInterface.call("mPlayerRemote.update", this._id, (this._audioDesc) ? "audiodescription" : "noaudiodescription");
-		}
+		}*/
 	}
 
 }
