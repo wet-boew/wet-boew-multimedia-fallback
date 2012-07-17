@@ -105,6 +105,11 @@ package
 			return _player.mediaPlayer.duration;
 		}
 		
+		public function Seeking():Boolean
+		{
+			return _player.mediaPlayer.seeking;
+		}
+		
 		
 		/**
 		 *  Listeners and State functions
@@ -174,6 +179,7 @@ package
 			ExternalInterface.addCallback("currentTime", CurrentTime);
 			ExternalInterface.addCallback("setCurrentTime", SetCurrentTime);
 			ExternalInterface.addCallback("duration", Duration);
+			ExternalInterface.addCallback("seeking", Seeking);
 			
 			ExternalInterface.addCallback("toggleMute", toggleMute);
 			ExternalInterface.addCallback("toggleAudioDescription", toggleAudioDescription);
