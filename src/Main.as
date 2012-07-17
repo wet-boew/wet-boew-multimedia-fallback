@@ -125,6 +125,16 @@ package
 			_player.mediaPlayer.volume = volume;
 		}
 		
+		public function Muted():Boolean
+		{
+			return _player.mediaPlayer.muted;
+		}
+		
+		public function SetMuted(muted:Boolean):void
+		{
+			_player.mediaPlayer.muted = muted;
+		}
+		
 		
 		
 		/**
@@ -199,6 +209,8 @@ package
 			ExternalInterface.addCallback("buffered", Buffered);
 			ExternalInterface.addCallback("volume", Volume);
 			ExternalInterface.addCallback("setVolume", SetVolume);
+			ExternalInterface.addCallback("muted", Muted);
+			ExternalInterface.addCallback("setMuted", SetMuted);
 			
 			ExternalInterface.addCallback("toggleMute", toggleMute);
 			ExternalInterface.addCallback("toggleAudioDescription", toggleAudioDescription);
