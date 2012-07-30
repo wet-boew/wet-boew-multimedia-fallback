@@ -166,6 +166,8 @@ package
 			_player.mediaPlayer.autoDynamicStreamSwitch = true;
 			_player.mediaPlayer.volume=Number(settings.getParameter("volume"));
 			_player.scaleMode=settings.getScaleMode();
+			_player.height=stage.stageHeight;
+			_player.width=stage.stageWidth;
 			
 			// Put the video sprite to stage
 			_player.resource=new URLResource(settings.getParameter("media"));
@@ -174,8 +176,8 @@ package
 			// load poster image for the multimedia
 			
 			poster=new Loader();
-			poster.contentLoaderInfo.addEventListener(Event.COMPLETE, OnImgComplete);
 			poster.load(new URLRequest(settings.getParameter("posterimg")));
+			poster.contentLoaderInfo.addEventListener(Event.COMPLETE, OnImgComplete);
 			poster.name="posterimg";
 			addChild(poster);
 			
@@ -217,9 +219,9 @@ package
 		
 		private function OnImgComplete(event:Event):void
 		{
-			var imageLoader:Loader=Loader(event.target.loader);
-			Bitmap(imageLoader.content).smoothing=true;
-			OnStageResize(null);
+			var poster:Loader=Loader(event.currentTarget.loader);
+			poster.width=stage.stageWidth;
+			poster.height=stage.stageHeight;
 		}
 		
 		private function onBytesUpdate(evt:LoadEvent):void
@@ -233,8 +235,7 @@ package
 		}
 
 		private function onPlayStateChange(evt:PlayEvent):void
-		{_player.width=stage.stageWidth;
-			_player.height=stage.stageHeight;
+		{	
 			if (_player.mediaPlayer.playing)
 			{
 				ExternalInterface.call("setTimeout", "pe.triggermediaevent('" + this._id + "', 'play')", 0);
