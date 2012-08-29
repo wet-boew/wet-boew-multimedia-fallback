@@ -187,7 +187,9 @@ package
 		private function registerCallbacks():void
 		{
 			ExternalInterface.addCallback("play", Play);
+			ExternalInterface.addCallback("doPlay", Play);
 			ExternalInterface.addCallback("pause", Pause);
+			ExternalInterface.addCallback("doPause", Pause);
 			ExternalInterface.addCallback("paused", Paused);
 			ExternalInterface.addCallback("currentTime", CurrentTime);
 			ExternalInterface.addCallback("setCurrentTime", SetCurrentTime);
