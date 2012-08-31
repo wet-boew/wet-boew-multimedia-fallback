@@ -77,21 +77,23 @@ package
 		
 		public function SetCurrentTime(newTime:Number):void
 		{
-			if (_player.mediaPlayer.canSeekTo(newTime) || newTime < 0)
-			{
-				if (newTime >= _player.mediaPlayer.duration)
+			if (_player.mediaPlayer.canSeek){
+				if (_player.mediaPlayer.canSeekTo(newTime) || newTime < 0)
 				{
-					_player.mediaPlayer.seek(_player.mediaPlayer.duration);
-				}
-				else if (newTime < 0)
-				{
-					_player.mediaPlayer.seek(0);
-					_player.mediaPlayer.stop();
-					onComplete(null);
-				}
-				else
-				{
-					_player.mediaPlayer.seek(newTime);
+					if (newTime >= _player.mediaPlayer.duration)
+					{
+						_player.mediaPlayer.seek(_player.mediaPlayer.duration);
+					}
+					else if (newTime < 0)
+					{
+						_player.mediaPlayer.seek(0);
+						_player.mediaPlayer.stop();
+						onComplete(null);
+					}
+					else
+					{
+						_player.mediaPlayer.seek(newTime);
+					}
 				}
 			}
 		}
