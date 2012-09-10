@@ -18,12 +18,8 @@ package
 	import flash.events.IOErrorEvent;
 	import flash.events.SecurityErrorEvent;
 	
-	import org.osmf.events.LoadEvent;
-	import org.osmf.events.BufferEvent;
 
 	import org.osmf.events.MediaPlayerStateChangeEvent;
-	import org.osmf.events.MetadataEvent;
-	import org.osmf.events.PlayEvent;
 	import org.osmf.events.TimeEvent;
 	import org.osmf.events.AudioEvent;	
 	
@@ -157,9 +153,7 @@ package
 			
 			// start creating the video player
 			_player=new MediaPlayerSprite();
-			_player.mediaPlayer.addEventListener(LoadEvent.BYTES_LOADED_CHANGE, onBytesUpdate);
-			_player.mediaPlayer.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferUpdate);
-			_player.mediaPlayer.addEventListener(PlayEvent.PLAY_STATE_CHANGE, onPlayStateChange);
+			_player.mediaPlayer.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onMediaPlayerStateChange);
 			_player.mediaPlayer.addEventListener(TimeEvent.CURRENT_TIME_CHANGE, onTimeUpdate);
 			_player.mediaPlayer.addEventListener(AudioEvent.MUTED_CHANGE, onVolumeChange);
 			_player.mediaPlayer.addEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
@@ -227,21 +221,12 @@ package
 			poster.width=stage.stageWidth;
 			poster.height=stage.stageHeight;
 		}
-		
-		private function onBytesUpdate(evt:LoadEvent):void
-		{
-			//ExternalInterface.call("mPlayerRemote.update", this._id, "loaded", Math.floor((evt.target.bytesLoaded / evt.target.bytesTotal) * 100));
-		}
-		
-		private function onBufferUpdate(evt:BufferEvent):void
-		{
-			//ExternalInterface.call("mPlayerRemote.update", this._id, "buffer", evt.target.bufferLength);
-		}
 
-		private function onPlayStateChange(evt:PlayEvent):void
+		private function onMediaPlayerStateChange(evt:MediaPlayerStateChangeEvent ):void
 		{	
-			if (_player.mediaPlayer.playing)
+			if (evt.state == MediaPlayerState.PLAYING)
 			{
+				ExternalInterface.call("setTimeout", "pe.triggermediaevent('" + this._id + "', 'canplay')", 0);
 				ExternalInterface.call("setTimeout", "pe.triggermediaevent('" + this._id + "', 'play')", 0);
 				ExternalInterface.call("setTimeout", "pe.triggermediaevent('" + this._id + "', 'playing')", 0);
 				if (_player.media is AudioElement)
@@ -253,13 +238,18 @@ package
 					getChildByName("posterimg").visible=false;
 				}
 			}
-			else
+			else if (evt.state == MediaPlayerState.PAUSED)
 			{
 				ExternalInterface.call("setTimeout", "pe.triggermediaevent('" + this._id + "', 'pause')", 0);
 				getChildByName("playbutton").visible=true;
 			}
+			else if (evt.state == MediaPlayerState.BUFFERING)
+			{
+				ExternalInterface.call("setTimeout", "pe.triggermediaevent('" + this._id + "', 'waiting')", 0);
+				getChildByName("playbutton").visible=true;
+			}
 		}
-
+		
 		private function onTimeUpdate(evt:TimeEvent):void
 		{
 				ExternalInterface.call("setTimeout", "pe.triggermediaevent('" + this._id + "', 'timeupdate')", 0);
