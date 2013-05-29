@@ -153,7 +153,8 @@ package
 			
 			// start creating the video player
 			_player=new MediaPlayerSprite();
-			_player.mediaPlayer.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onMediaPlayerStateChange);
+			_player.mediaPlayer.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onStateChange);
+			_player.mediaPlayer.addEventListener(TimeEvent.DURATION_CHANGE, onDurationChange);
 			_player.mediaPlayer.addEventListener(TimeEvent.CURRENT_TIME_CHANGE, onTimeUpdate);
 			_player.mediaPlayer.addEventListener(AudioEvent.MUTED_CHANGE, onVolumeChange);
 			_player.mediaPlayer.addEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
@@ -222,7 +223,7 @@ package
 			poster.height=stage.stageHeight;
 		}
 
-		private function onMediaPlayerStateChange(evt:MediaPlayerStateChangeEvent ):void
+		private function onStateChange(evt:MediaPlayerStateChangeEvent ):void
 		{	
 			if (evt.state == MediaPlayerState.PLAYING)
 			{
@@ -247,6 +248,13 @@ package
 			{
 				ExternalInterface.call("setTimeout", "pe.triggermediaevent('" + this._id + "', 'waiting')", 0);
 				getChildByName("playbutton").visible=true;
+			}
+		}
+
+		private function onDurationChange(evt:TimeEvent):void
+		{
+			if (evt.target.duration > 0){
+				ExternalInterface.call("setTimeout", "pe.triggermediaevent('" + this._id + "', 'durationchange')", 0);
 			}
 		}
 		
