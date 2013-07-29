@@ -23,11 +23,15 @@ package
 	import org.osmf.events.TimeEvent;
 	import org.osmf.events.AudioEvent;	
 	
+	import org.osmf.media.MediaFactory;
+	import org.osmf.media.MediaResourceBase;
 	import org.osmf.media.MediaPlayerSprite;
 	import org.osmf.media.MediaType;
 	import org.osmf.media.MediaPlayerState;
-	import org.osmf.media.URLResource;
+	import org.osmf.net.StreamingURLResource
 	import org.osmf.elements.AudioElement;
+	import org.osmf.media.PluginInfoResource;
+	import org.strym.osmf.plugins.pseudostreaming.PseudostreamingPluginInfo;
 
 	public class Main extends MovieClip
 	{
@@ -150,6 +154,10 @@ package
 			
 			// since the ExternalInterface library for flash needs the embed tag inorder to identify its self in the HTML DOM, we will feed it its id, since we cannot use embed tag for compliance
 			_id=settings.getParameter("id");
+
+			var factory:MediaFactory = new MediaFactory();
+			factory.loadPlugin(new PluginInfoResource(new PseudostreamingPluginInfo()));
+			var resource:MediaResourceBase = new StreamingURLResource(settings.getParameter("media"));
 			
 			// start creating the video player
 			_player=new MediaPlayerSprite();
@@ -167,7 +175,7 @@ package
 			_player.width=stage.stageWidth;
 			
 			// Put the video sprite to stage
-			_player.resource=new URLResource(settings.getParameter("media"));
+			_player.media=factory.createMediaElement(resource);
 			addChild(_player);
 			
 			// load poster image for the multimedia
