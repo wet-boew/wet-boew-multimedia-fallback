@@ -22,15 +22,16 @@ package
 	import org.osmf.events.MediaPlayerStateChangeEvent;
 	import org.osmf.events.TimeEvent;
 	import org.osmf.events.AudioEvent;	
-	
+
 	import org.osmf.media.MediaFactory;
 	import org.osmf.media.MediaResourceBase;
 	import org.osmf.media.MediaPlayerSprite;
 	import org.osmf.media.MediaType;
 	import org.osmf.media.MediaPlayerState;
-	import org.osmf.net.StreamingURLResource
+	import org.osmf.media.URLResource;
 	import org.osmf.elements.AudioElement;
 	import org.osmf.media.PluginInfoResource;
+
 	import org.strym.osmf.plugins.pseudostreaming.PseudostreamingPluginInfo;
 
 	public class Main extends MovieClip
@@ -41,6 +42,7 @@ package
 		private var _mediaType:MediaType;
 		
 		private var poster:Loader;
+		private var resource:URLResource
 		private var _player:MediaPlayerSprite;
 		private var settings:Config;
 		//TODO : Remove this variable (used for the audio description shell functionality)
@@ -77,25 +79,20 @@ package
 		
 		public function SetCurrentTime(newTime:Number):void
 		{
-			if (_player.mediaPlayer.canSeek){
-				if (_player.mediaPlayer.canSeekTo(newTime) || newTime < 0)
-				{
-					if (newTime >= _player.mediaPlayer.duration)
-					{
-						_player.mediaPlayer.seek(_player.mediaPlayer.duration);
-					}
-					else if (newTime < 0)
-					{
-						_player.mediaPlayer.seek(0);
-						_player.mediaPlayer.stop();
-						onComplete(null);
-					}
-					else
-					{
-						_player.mediaPlayer.seek(newTime);
-					}
-				}
+			var time:Number;
+			if (newTime >= _player.mediaPlayer.duration)
+			{
+				time = _player.mediaPlayer.duration;
 			}
+			else if (newTime < 0)
+			{
+				time = 0;
+			}
+			else
+			{
+				time = newTime;
+			}
+			_player.mediaPlayer.seek(time);
 		}
 		
 		public function Duration():Number
@@ -157,7 +154,8 @@ package
 
 			var factory:MediaFactory = new MediaFactory();
 			factory.loadPlugin(new PluginInfoResource(new PseudostreamingPluginInfo()));
-			var resource:MediaResourceBase = new StreamingURLResource(settings.getParameter("media"));
+			resource = new URLResource(settings.getParameter("media"));
+			resource.addMetadataValue("pseudostreaming_query", "?start={time}");
 			
 			// start creating the video player
 			_player=new MediaPlayerSprite();
@@ -173,7 +171,7 @@ package
 			_player.scaleMode=settings.getScaleMode();
 			_player.height=stage.stageHeight;
 			_player.width=stage.stageWidth;
-			
+
 			// Put the video sprite to stage
 			_player.media=factory.createMediaElement(resource);
 			addChild(_player);
