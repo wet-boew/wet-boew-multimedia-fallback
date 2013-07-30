@@ -1,9 +1,9 @@
-/*!
+/*
  * Web Experience Toolkit (WET) / Boîte à outils de l'expérience Web (BOEW)
- * www.tbs.gc.ca/ws-nw/wet-boew/terms / www.sct.gc.ca/ws-nw/wet-boew/conditions
+ * wet-boew.github.io/wet-boew/License-eng.html / wet-boew.github.io/wet-boew/Licence-fra.html
  */
 
-package
+package org.wet_boew.wet_boew_multimedia_fallback
 {
 	import flash.display.MovieClip;
 	import flash.display.Loader;
@@ -22,12 +22,17 @@ package
 	import org.osmf.events.MediaPlayerStateChangeEvent;
 	import org.osmf.events.TimeEvent;
 	import org.osmf.events.AudioEvent;	
-	
+
+	import org.osmf.media.MediaFactory;
+	import org.osmf.media.MediaResourceBase;
 	import org.osmf.media.MediaPlayerSprite;
 	import org.osmf.media.MediaType;
 	import org.osmf.media.MediaPlayerState;
 	import org.osmf.media.URLResource;
 	import org.osmf.elements.AudioElement;
+	import org.osmf.media.PluginInfoResource;
+
+	import org.strym.osmf.plugins.pseudostreaming.PseudostreamingPluginInfo;
 
 	public class Main extends MovieClip
 	{
@@ -37,6 +42,7 @@ package
 		private var _mediaType:MediaType;
 		
 		private var poster:Loader;
+		private var resource:URLResource
 		private var _player:MediaPlayerSprite;
 		private var settings:Config;
 		//TODO : Remove this variable (used for the audio description shell functionality)
@@ -73,25 +79,20 @@ package
 		
 		public function SetCurrentTime(newTime:Number):void
 		{
-			if (_player.mediaPlayer.canSeek){
-				if (_player.mediaPlayer.canSeekTo(newTime) || newTime < 0)
-				{
-					if (newTime >= _player.mediaPlayer.duration)
-					{
-						_player.mediaPlayer.seek(_player.mediaPlayer.duration);
-					}
-					else if (newTime < 0)
-					{
-						_player.mediaPlayer.seek(0);
-						_player.mediaPlayer.stop();
-						onComplete(null);
-					}
-					else
-					{
-						_player.mediaPlayer.seek(newTime);
-					}
-				}
+			var time:Number;
+			if (newTime >= _player.mediaPlayer.duration)
+			{
+				time = _player.mediaPlayer.duration;
 			}
+			else if (newTime < 0)
+			{
+				time = 0;
+			}
+			else
+			{
+				time = newTime;
+			}
+			_player.mediaPlayer.seek(time);
 		}
 		
 		public function Duration():Number
@@ -150,6 +151,11 @@ package
 			
 			// since the ExternalInterface library for flash needs the embed tag inorder to identify its self in the HTML DOM, we will feed it its id, since we cannot use embed tag for compliance
 			_id=settings.getParameter("id");
+
+			var factory:MediaFactory = new MediaFactory();
+			factory.loadPlugin(new PluginInfoResource(new PseudostreamingPluginInfo()));
+			resource = new URLResource(settings.getParameter("media"));
+			resource.addMetadataValue("pseudostreaming_query", "?start={time}");
 			
 			// start creating the video player
 			_player=new MediaPlayerSprite();
@@ -165,9 +171,9 @@ package
 			_player.scaleMode=settings.getScaleMode();
 			_player.height=stage.stageHeight;
 			_player.width=stage.stageWidth;
-			
+
 			// Put the video sprite to stage
-			_player.resource=new URLResource(settings.getParameter("media"));
+			_player.media=factory.createMediaElement(resource);
 			addChild(_player);
 			
 			// load poster image for the multimedia
