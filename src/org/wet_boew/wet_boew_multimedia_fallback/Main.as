@@ -225,9 +225,9 @@ package org.wet_boew.wet_boew_multimedia_fallback
 				{
 						if (evt.state == MediaPlayerState.PLAYING)
 						{
-								ExternalInterface.call("setTimeout", "pe.triggermediaevent('" + this._id + "', 'canplay')", 0);
-								ExternalInterface.call("setTimeout", "pe.triggermediaevent('" + this._id + "', 'play')", 0);
-								ExternalInterface.call("setTimeout", "pe.triggermediaevent('" + this._id + "', 'playing')", 0);
+								ExternalInterface.call("setTimeout", "jQuery('#" + this._id + " :first-child').trigger('canplay')", 0);
+								ExternalInterface.call("setTimeout", "jQuery('#" + this._id + " :first-child').trigger('play')", 0);
+								ExternalInterface.call("setTimeout", "jQuery('#" + this._id + " :first-child').trigger('playing')", 0);
 								if (_player.media is AudioElement)
 								{
 										getChildByName("posterimg").visible=true;
@@ -239,12 +239,12 @@ package org.wet_boew.wet_boew_multimedia_fallback
 						}
 						else if (evt.state == MediaPlayerState.PAUSED)
 						{
-								ExternalInterface.call("setTimeout", "pe.triggermediaevent('" + this._id + "', 'pause')", 0);
+								ExternalInterface.call("setTimeout", "jQuery('#" + this._id + " :first-child').trigger('pause')", 0);
 								getChildByName("playbutton").visible=true;
 						}
 						else if (evt.state == MediaPlayerState.BUFFERING)
 						{
-								ExternalInterface.call("setTimeout", "pe.triggermediaevent('" + this._id + "', 'waiting')", 0);
+								ExternalInterface.call("setTimeout", "jQuery('#" + this._id + " :first-child').trigger('waiting')", 0);
 								getChildByName("playbutton").visible=true;
 						}
 				}
@@ -252,23 +252,23 @@ package org.wet_boew.wet_boew_multimedia_fallback
 				private function onDurationChange(evt:TimeEvent):void
 				{
 						if (evt.target.duration > 0){
-								ExternalInterface.call("setTimeout", "pe.triggermediaevent('" + this._id + "', 'durationchange')", 0);
+								ExternalInterface.call("setTimeout", "jQuery('#" + this._id + " :first-child').trigger('durationchange')", 0);
 						}
 				}
 
 				private function onTimeUpdate(evt:TimeEvent):void
 				{
-								ExternalInterface.call("setTimeout", "pe.triggermediaevent('" + this._id + "', 'timeupdate')", 0);
+								ExternalInterface.call("setTimeout", "jQuery('#" + this._id + " :first-child').trigger('timeupdate')", 0);
 				}
 
 				private function onVolumeChange(evt:AudioEvent):void
 				{
-						ExternalInterface.call("setTimeout", "pe.triggermediaevent('" + this._id + "', 'volumechange')", 0);
+						ExternalInterface.call("setTimeout", "jQuery('#" + this._id + " :first-child').trigger('volumechange')", 0);
 				}
 
 				private function onComplete(evt:TimeEvent):void
 				{
-						ExternalInterface.call("setTimeout", "pe.triggermediaevent('" + this._id + "', 'ended')", 0);
+						ExternalInterface.call("setTimeout", "jQuery('#" + this._id + " :first-child').trigger('ended')", 0);
 						//getChildByName("posterimg").visible=true;
 				}
 
